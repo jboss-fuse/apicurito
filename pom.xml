@@ -5,7 +5,7 @@
 
     <groupId>io.apicurio</groupId>
     <artifactId>apicurito</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0.fuse-730001</version>
     <packaging>pom</packaging>
     <name>apicurito</name>
 
@@ -90,7 +90,7 @@
         <version.docker.plugin>0.11.2</version.docker.plugin>
         <version.frontend-maven.plugin>1.6</version.frontend-maven.plugin>
         <version.scala-maven.plugin>3.2.2</version.scala-maven.plugin>
-        <version.fabric8.maven.plugin>3.5.33</version.fabric8.maven.plugin>
+        <version.fabric8.maven.plugin>3.5.33.fuse-730002</version.fabric8.maven.plugin>
 
         <!-- Dependency Versions -->
         <version.com.fasterxml.jackson>2.9.4</version.com.fasterxml.jackson>
@@ -111,7 +111,7 @@
         <version.org.jboss.spec.javax.websocket.jboss-websocket-api_1.1_spec>1.1.1.Final</version.org.jboss.spec.javax.websocket.jboss-websocket-api_1.1_spec>
         <version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.0_spec>1.0.1.Beta1</version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.0_spec>
         <version.org.json>20160212</version.org.json>
-        <version.org.slf4j>1.7.7</version.org.slf4j>
+        <version.org.slf4j>1.7.22.redhat-2</version.org.slf4j>
     </properties>
 
     <dependencyManagement>
@@ -551,16 +551,6 @@
             <id>release</id>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                        </configuration>
-                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
