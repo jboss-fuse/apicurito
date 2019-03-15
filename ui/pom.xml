@@ -111,6 +111,7 @@
                             <descriptors>
                                 <descriptor>src/assembly/unix-dist.xml</descriptor>
                             </descriptors>
+                            <tarLongFileMode>posix</tarLongFileMode>
                         </configuration>
                     </execution>
                 </executions>
@@ -213,6 +214,7 @@
                                     <descriptors>
                                         <descriptor>${project.basedir}/assembly-descriptors/linux-amd64.xml</descriptor>
                                     </descriptors>
+                                    <tarLongFileMode>posix</tarLongFileMode>
                                     <finalName>${project.name}-${project.version}</finalName>
                                 </configuration>
                             </execution>
