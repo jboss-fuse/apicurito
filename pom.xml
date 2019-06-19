@@ -5,7 +5,7 @@
 
     <groupId>io.apicurio</groupId>
     <artifactId>apicurito</artifactId>
-    <version>1.0.1.fuse-740018</version>
+    <version>1.0.1.fuse-740018-redhat-00001</version>
     <packaging>pom</packaging>
     <name>apicurito</name>
 
@@ -90,7 +90,7 @@
         <version.docker.plugin>0.11.2</version.docker.plugin>
         <version.frontend-maven.plugin>1.7.6</version.frontend-maven.plugin>
         <version.scala-maven.plugin>3.2.2</version.scala-maven.plugin>
-        <version.fabric8.maven.plugin>3.5.33.fuse-740024</version.fabric8.maven.plugin>
+        <version.fabric8.maven.plugin>3.5.33.fuse-740024-redhat-00001</version.fabric8.maven.plugin>
 
         <!-- Dependency Versions -->
         <version.com.fasterxml.jackson>2.9.4</version.com.fasterxml.jackson>
