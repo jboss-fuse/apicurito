@@ -5,7 +5,7 @@
 
     <groupId>io.apicurio</groupId>
     <artifactId>apicurito</artifactId>
-    <version>1.2.2</version>
+    <version>1.2.2.fuse-790002</version>
     <packaging>pom</packaging>
     <name>apicurito</name>
 
@@ -90,7 +90,7 @@
         <version.docker.plugin>0.11.2</version.docker.plugin>
         <version.frontend-maven.plugin>1.7.6</version.frontend-maven.plugin>
         <version.scala-maven.plugin>3.2.2</version.scala-maven.plugin>
-        <version.fabric8.maven.plugin>3.5.33</version.fabric8.maven.plugin>
+        <version.fabric8.maven.plugin>4.3.0.fuse-790002</version.fabric8.maven.plugin>
 
         <!-- Dependency Versions -->
         <!-- ENTESB-12869: versions from com.fasterxml.jackson/jackson-bom/2.9.10.20200411-redhat-00001 -->
@@ -553,16 +553,6 @@
             <id>release</id>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                        </configuration>
-                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
