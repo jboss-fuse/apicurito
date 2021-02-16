@@ -1,18 +1,30 @@
-<div class="app-editor">
+<div class="app-editor" id="app-editor">
     <div class="actionbar">
         <!-- Save Button -->
-        <!--<button class="btn btn-lg btn-primary btn-save" (click)="save()">Save</button>-->
-        <div class="btn-group">
-            <button type="button" class="btn btn-lg btn-primary" (click)="save('yaml')">Save As...</button>
-            <button type="button" class="btn btn-lg btn-primary dropdown-toggle btn-save" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="caret"></span>
-                <span class="sr-only">Toggle Dropdown</span>
-            </button>
-            <ul class="dropdown-menu">
-                <li><a (click)="save('yaml')">Save as YAML</a></li>
-                <li><a (click)="save('json')">Save as JSON</a></li>
-            </ul>
-        </div>
+        <div *ngIf="apiDefinitionFile.hasFileHandle; then hasFileHandle else noFileHandle"></div>
+        <ng-template #hasFileHandle>
+            <div class="btn-group">
+                <button type="button" class="btn btn-lg btn-primary" (click)="save('save')">Save</button>
+                <button type="button" class="btn btn-lg btn-primary btn-save" (click)="save('save-as')">Save
+                As...</button>
+            </div>
+        </ng-template>
+        <ng-template #noFileHandle>
+            <div class="btn-group">
+                <button type="button" class="btn btn-lg btn-primary" (click)="save('save-as')">Save As...</button>
+                <button type="button" class="btn btn-lg btn-primary dropdown-toggle btn-save" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a (click)="save('save-as', 'yaml')">Save as YAML</a></li>
+                    <li><a (click)="save('save-as', 'json')">Save as JSON</a></li>
+                </ul>
+            </div>
+        </ng-template>
+
+        <!-- Convert Button -->
+        <button *ngIf="isOpenAPI2()" class="btn btn-lg btn-default btn-convert" data-toggle="modal" data-target="#convert-modal">Convert to OpenAPI 3</button>
 
         <!-- Close Button -->
         <button class="btn btn-lg btn-default btn-close" data-toggle="modal" data-target="#close-modal">Close</button>
@@ -32,12 +44,17 @@
             </ul>
         </div>
     </div>
-    <div class="editor">
-        <api-editor #apiEditor [api]="api" [embedded]="true"></api-editor>
+    <div class="editor" *ngIf="!converting">
+        <api-editor #apiEditor [api]="api" [embedded]="true" (onCommandExecuted)="documentChanged()"
+                    (onUndo)="documentChanged()" (onRedo)="documentChanged()" [features]="{ validationSettings: true }"
+                    [validationRegistry]="validation" (onConfigureValidation)="configureValidationDialog.open()" ></api-editor>
+    </div>
+    <div class="converting" *ngIf="converting">
+        <div class="spinner spinner-lg"></div><span>Converting API Design to OpenAPI 3.0.  Please wait...</span>
     </div>
 
-    <!-- Toast Notification: Generation Success -->
-    <div class="toast-pf alert alert-success alert-dismissable" [class.shown]="showSuccessToast">
+    <!-- Inline Notification: Generation Success -->
+    <div class="alert-global alert alert-success alert-dismissable" [class.shown]="showSuccessToast">
         <button type="button" class="close" (click)="closeSuccessToast()">
             <span class="pficon pficon-close"></span>
         </button>
@@ -45,8 +62,8 @@
         <strong>Success!</strong> The project has been successfully generated.
     </div>
 
-    <!-- Toast Notification: Generation Failed -->
-    <div class="toast-pf alert alert-danger alert-dismissable" [class.shown]="showErrorToast">
+    <!-- Inline Notification: Generation Failed -->
+    <div class="alert-global alert alert-danger alert-dismissable" [class.shown]="showErrorToast">
         <button type="button" class="close" (click)="closeErrorToast()">
             <span class="pficon pficon-close"></span>
         </button>
@@ -82,3 +99,31 @@
         </div>
     </div>
 </div>
+<div class="confirm-convert-modal modal fade" id="convert-modal" tabindex="-1" role="dialog" aria-labelledby="convertModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    <span class="pficon pficon-close"></span>
+                </button>
+                <h4 class="modal-title" id="convertModalLabel">Convert API to OpenAPI 3.0</h4>
+            </div>
+            <div class="modal-body">
+                <h2 class="about-title">Really convert from OpenAPI/Swagger 2 to OpenAPI 3?</h2>
+                <div>
+                    If you have made changes to the API, those changes <em>will</em> be
+                    included in the conversion.  However, you may still want to save the
+                    design before converting it...just in case.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default"
+                        data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary"
+                        (click)="convert()" data-dismiss="modal">Convert</button>
+            </div>
+        </div>
+    </div>
+</div>
+<configure-validation-dialog #configureValidationDialog [validationEnabled]="validation === null"
+                             (onChange)="setValidation($event)"></configure-validation-dialog>

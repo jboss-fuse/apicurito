@@ -19,7 +19,25 @@ import {Component, EventEmitter, Input, Output, ViewChild} from "@angular/core";
 import {ApiDefinition, ApiEditorComponent} from "apicurio-design-studio";
 import {DownloaderService} from "../services/downloader.service";
 import {ConfigService, GeneratorConfig} from "../services/config.service";
-import * as YAML from "yamljs";
+import * as YAML from 'js-yaml';
+import {StorageService} from "../services/storage.service";
+import {
+    IValidationSeverityRegistry,
+    Library,
+    Oas20Document,
+    Oas30Document,
+    ValidationProblemSeverity
+} from "apicurio-data-models";
+import {ApiDefinitionFileService} from '../services/api-definition-file.service';
+
+export class DisableValidationRegistry implements IValidationSeverityRegistry {
+
+    public lookupSeverity(): ValidationProblemSeverity {
+        return ValidationProblemSeverity.high;
+    }
+
+}
+
 
 @Component({
     moduleId: module.id,
@@ -29,16 +47,7 @@ import * as YAML from "yamljs";
 })
 export class EditorComponent {
 
-    private _api: ApiDefinition;
-    private _originalContent: any;
-    @Input()
-    set api(apiDef: ApiDefinition) {
-        this._api = apiDef;
-        this._originalContent = apiDef.spec;
-    }
-    get api(): ApiDefinition {
-        return this._api;
-    }
+    @Input() api: ApiDefinition;
 
     @Output() onClose: EventEmitter<void> = new EventEmitter<void>();
 
@@ -50,38 +59,90 @@ export class EditorComponent {
     showErrorToast: boolean = false;
     toastTimeoutId: number = null;
 
-    constructor(private downloader: DownloaderService, public config:ConfigService) {}
+    persistenceTimeout: number;
 
-    public save(format: string = "json"): Promise<boolean> {
+    validation: IValidationSeverityRegistry = null;
+
+    converting: boolean = false;
+
+    /**
+     * Constructor.
+     * @param downloader
+     * @param config
+     * @param storage
+     */
+    constructor(private downloader: DownloaderService, public config: ConfigService,
+                private storage: StorageService, public apiDefinitionFile: ApiDefinitionFileService) {}
+
+    /**
+     * Called whenever the API definition is changed by the user.
+     */
+    public documentChanged(): any {
+        console.info("[EditorComponent] Detected a document change, scheduling disaster recovery persistence");
+        if (this.persistenceTimeout) {
+            clearTimeout(this.persistenceTimeout);
+            this.persistenceTimeout = null;
+        }
+        this.persistenceTimeout = setTimeout( () => {
+            this.storage.store(this.apiEditor.getValue());
+            this.persistenceTimeout = null;
+        }, 5000);
+    }
+
+    /**
+     * Called to convert from OpenAPI 2 to 3.
+     */
+    public convert(): void {
+        this.converting = true;
+
+        const me: EditorComponent = this;
+        let currentApi: ApiDefinition = me.apiEditor.getValue();
+
+        // Do this work in a timer to workaround this bug:  https://github.com/Apicurio/apicurio-studio/issues/1031
+        // Once that bug is fixed, we can remove this workaround.
+        setTimeout(() => {
+            console.debug("[EditorComponent] Converting from OpenAPI 2 to 3!");
+            let doc20: Oas20Document = <Oas20Document> Library.readDocument(currentApi.spec);
+            let doc30: Oas30Document = Library.transformDocument(doc20);
+
+            let api30: ApiDefinition = new ApiDefinition();
+            api30.spec = Library.writeNode(doc30);
+            api30.type = "OpenAPI30";
+            api30.name = currentApi.name;
+            api30.createdBy = currentApi.createdBy;
+            api30.createdOn = currentApi.createdOn;
+            api30.description = currentApi.description;
+            api30.id = currentApi.id;
+            api30.tags = currentApi.tags;
+
+            me.api = api30;
+            me.converting = false;
+        }, 500);
+    }
+
+    public async save(mode: "save" | "save-as" = "save", format?: "json" | "yaml"): Promise<void> {
         console.info("[EditorComponent] Saving the API definition.");
         this.generateError = null;
-        let ct: string = "application/json";
-        let filename: string = "openapi-spec";
-        let spec: any = this.apiEditor.getValue().spec;
-        if (typeof spec === "object") {
-            if (format === "json") {
-                spec = JSON.stringify(spec, null, 4);
-                filename += ".json";
-            } else {
-                spec = YAML.stringify(spec, 100, 4);
-                filename += ".yaml";
-            }
-        }
-        let content: string = spec;
-        return this.downloader.downloadToFS(content, ct, filename);
+
+        await this.apiDefinitionFile.save(this.apiEditor.getValue().spec, {
+            mode,
+            format
+        });
+
+        this.storage.clear();
     }
 
     public close(): void {
         console.info("[EditorComponent] Closing the editor.");
         this.generateError = null;
+        this.storage.clear();
         this.onClose.emit();
     }
 
-    public saveAndClose(): void {
+    public async saveAndClose(): Promise<void> {
         console.info("[EditorComponent] Saving and then closing the editor.");
-        this.save().then( () => {
-            this.close();
-        });
+        await this.save();
+        this.close();
     }
 
     public generate(gconfig: GeneratorConfig): void {
@@ -124,6 +185,19 @@ export class EditorComponent {
     public closeErrorToast(): void {
         this.showErrorToast = false;
         clearTimeout(this.toastTimeoutId);
+    }
+
+    public setValidation(enabled: boolean): void {
+        if (enabled) {
+            this.validation = null;
+        } else {
+            this.validation = new DisableValidationRegistry();
+        }
+    }
+
+    public isOpenAPI2(): boolean {
+        console.info(this.api.type);
+        return this.api.type == "OpenAPI20";
     }
 
 }

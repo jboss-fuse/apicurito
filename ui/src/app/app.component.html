@@ -1,10 +1,96 @@
-<div class="app-wrapper">
-    <div class="app-masthead">
-        <nav-header></nav-header>
-    </div>
+<div class="pf-c-page" id="page-layout-default-nav">
+
+    <header role="banner" class="pf-c-page__header">
+        <div class="pf-c-page__header-brand">
+            <a *ngIf = "showLogo" class="pf-c-page__header-brand-link">
+                <img class="pf-c-brand" src="assets/apicurio_logo_darkbkg_200px.png" alt="Apicurito"> 
+            </a>
+            <a *ngIf = "showCrossConsole" class="pf-c-page__header-brand-link">
+                <img class="pf-c-brand" src="assets/Logo-Red_Hat-Managed_Integration-A-Reverse-RGB.png" alt="Apicurito">
+            </a>
+        </div>
+
+        <div class="app-context-selector-wrapper">
+            <div *ngIf="showCrossConsole" class="pf-c-context-selector">
+                <button class="pf-c-context-selector__toggle"
+                    id="context-selector-collapsed-example-toggle"
+                    aria-labelledby="context-selector-collapsed-example-label"
+                    (click)="crossConsoleExpanded = !crossConsoleExpanded">
+                    <span class="pf-c-context-selector__toggle-text">API Designer</span>
+                    <i class="fas fa-caret-down pf-c-context-selector__toggle-icon" aria-hidden="true"></i>
+                </button>
+                <div class="pf-c-context-selector__menu" *ngIf="crossConsoleExpanded"> 
+                    <ul class="pf-c-context-selector__menu-list" style="overflow-y: unset;">
+                        <li *ngFor="let app of apps">
+                            <button class="pf-c-context-selector__menu-list-item" (click)="navigate(app.rootUrl)">{{app.name}}</button>
+                        </li>
+                      </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="pf-c-page__header-tools">
+            <div class="pf-c-dropdown">
+                <button class="pf-c-dropdown__toggle pf-m-plain" id="page-layout-default-nav-dropdown-button"
+                        aria-expanded="false" (click)="helpExpanded = !helpExpanded">
+                    <span class="pf-c-dropdown__toggle-text"><img class="pf-c-avatar" src="assets/pf/img_avatar.svg" alt="Avatar Image"></span>
+                    <i class="fas fa-caret-down pf-c-dropdown__toggle-icon" aria-hidden="true"></i>
+                </button>
+                <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="helpDropdownButton" *ngIf="helpExpanded">
+                    <li>
+                        <a class="pf-c-dropdown__menu-item" rel="nofollow"
+                           role="link" target="_blank" (click)="showAbout = true; helpExpanded = false">About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
     <div class="app-body">
         <empty-state *ngIf="apiDef === null" (onOpen)="openEditor($event)"></empty-state>
         <editor *ngIf="apiDef !== null" (onClose)="apiDef = null" [api]="apiDef"></editor>
     </div>
+
 </div>
 
+
+<div *ngIf="showAbout">
+    <div class="pf-c-backdrop">
+        <div class="pf-l-bullseye">
+            <div aria-labelledby="pf-about-modal-title-6" aria-describedby="pf-about-modal-content-7" role="dialog" aria-modal="true"
+                 class="pf-c-about-modal-box">
+                <div class="pf-c-about-modal-box__brand"><img class="pf-c-about-modal-box__brand-image"
+                                                              src="assets/apicurio_icon_darkbkg_200px.png"
+                                                              alt="Apicurito"></div>
+                <div class="pf-c-about-modal-box__close">
+                    <button aria-label="Close Dialog" class="pf-c-button pf-m-plain" type="button" (click)="showAbout = false">
+                        <svg fill="currentColor" height="1em" width="1em" viewBox="0 0 352 512" aria-hidden="true" role="img"
+                             style="vertical-align: -0.125em;">
+                            <path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
+                                  transform=""></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="pf-c-about-modal-box__header"><h1 id="pf-about-modal-title-6" class="pf-c-title pf-m-4xl">Apicurito (Little Apicurio)</h1>
+                </div>
+                <div class="pf-c-about-modal-box__content" id="pf-about-modal-content-7">
+                    <div class="pf-c-about-modal-box__body">
+                        <div class="pf-c-content">
+                            <div class="pf-c-content">
+                                <dl data-pf-content="true" class="">
+                                    <dt data-pf-content="true" class="">Version</dt>
+                                    <dd data-pf-content="true" class="">{{ appInfo.version }}</dd>
+                                    <dt data-pf-content="true" class="">Built On</dt>
+                                    <dd data-pf-content="true" class="">{{ appInfo.builtOn | date }}</dd>
+                                    <dt data-pf-content="true" class="">Project URL</dt>
+                                    <dd data-pf-content="true" class=""><a href="{{ appInfo.projectUrl }}" target="_blank">{{ appInfo.projectUrl }} <span class="fa fa-external-link"></span></a></dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pf-c-about-modal-box__hero"></div>
+            </div>
+        </div>
+    </div>
+</div>

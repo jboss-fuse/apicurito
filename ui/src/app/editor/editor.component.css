@@ -1,3 +1,7 @@
+#app-editor {
+  font-size: 13px;
+}
+
 .app-editor {
   display: flex;
   flex-direction: column;
@@ -14,9 +18,21 @@
   padding-right: 20px;
   text-align: right;
 }
-.app-editor .actionbar .btn-save {
+.app-editor .actionbar .btn-save, .app-editor .actionbar .btn-convert {
   margin-right: 5px;
 }
+
+.app-editor .converting {
+  padding: 25px;
+}
+.app-editor .converting > .spinner {
+  float: left;
+}
+.app-editor .converting > span {
+  font-size: 18px;
+  margin-left: 10px;
+}
+
 
 .app-editor .editor {
   flex-grow: 1;
@@ -40,7 +56,7 @@
   float: left;
 }
 
-.toast-pf {
+.alert-global {
   position: absolute;
   max-width: 500px;
   top: -100px;
@@ -52,7 +68,7 @@
   -o-transition: all .25s ease-out;
   transition: all .25s ease-out;
 }
-.toast-pf.shown {
+.alert-global.shown {
   top: 4px;
   left: 20px;
   opacity: 1;

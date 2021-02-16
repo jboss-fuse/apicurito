@@ -1,0 +1,8 @@
+bases:
+- ../bases/deployment
+commonLabels:
+  app: apicurito
+images:
+- name: apicurio/apicurito-operator
+  newName: fuse7/fuse-apicurito-rhel7-operator
+  newTag: "1.9"
