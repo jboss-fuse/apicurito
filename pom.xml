@@ -93,9 +93,8 @@
         <version.fabric8.maven.plugin>3.5.33</version.fabric8.maven.plugin>
 
         <!-- Dependency Versions -->
-        <!-- ENTESB-12869: versions from com.fasterxml.jackson/jackson-bom/2.9.10.20200411-redhat-00001 -->
-        <version.com.fasterxml.jackson>2.9.10</version.com.fasterxml.jackson>
-        <version.com.fasterxml.jackson.databind>2.9.10.4-redhat-00001</version.com.fasterxml.jackson.databind>
+        <version.com.fasterxml.jackson>2.12.1</version.com.fasterxml.jackson>
+        <version.com.fasterxml.jackson.databind>2.12.1</version.com.fasterxml.jackson.databind>
         <version.com.google.inject>4.1.0</version.com.google.inject>
         <version.com.sun.codemodel>2.6</version.com.sun.codemodel>
         <version.commons-beanutils>1.9.3.redhat-1</version.commons-beanutils>
